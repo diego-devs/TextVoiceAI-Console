@@ -1,4 +1,5 @@
 ﻿using Microsoft.CognitiveServices.Speech;
+using Microsoft.CognitiveServices.Speech.Audio;
 
 namespace TextVoiceAI
 {
@@ -14,20 +15,34 @@ namespace TextVoiceAI
         
         static async Task Main(string[] args)
         {
+            //var variables = Environment.GetEnvironmentVariables();
+            //foreach (var v in variables.Keys)
+            //{
+             //   Console.WriteLine(v.ToString());
+            //}
+            //Console.ReadLine();
             await ProgramLoop();
         }
         static async Task ProgramLoop() 
         {
-            await SpeechText();
-            System.Console.WriteLine("Try again y/n");
-            var r = Console.ReadLine();
-            if (r == "y" || r == "Y") 
+            Console.WriteLine("Select an option: ");
+            Console.WriteLine("1. Text to audio");
+            Console.WriteLine("2. Audio to text");
+            int x = int.Parse(Console.ReadLine());
+
+            switch (x)
             {
-                await ProgramLoop();
-            } else
-            {
-                Environment.Exit(0);
+                case 1:
+                    await SpeechText();
+                    break;
+                case 2:
+                    await SpeechToAudio();
+                    break;
+                default:
+                    Console.WriteLine("Not a valid option.");
+                    break;
             }
+            
         }
     
         static async Task SpeechText() {
@@ -41,9 +56,15 @@ namespace TextVoiceAI
                 // Get text from the console and synthesize to the default speaker.
                 Console.WriteLine("Enter some text that you want to speak >");
                 string text = Console.ReadLine();
-
-                var speechSynthesisResult = await speechSynthesizer.SpeakTextAsync(text);
-                OutputSpeechSynthesisResult(speechSynthesisResult, text);
+                if (text != null)
+                {
+                    var speechSynthesisResult = await speechSynthesizer.SpeakTextAsync(text);
+                    OutputSpeechSynthesisResult(speechSynthesisResult, text);
+                } 
+                else
+                {
+                    return;
+                }
             }
         }
         static void OutputSpeechSynthesisResult(SpeechSynthesisResult speechSynthesisResult, string text)
@@ -68,8 +89,43 @@ namespace TextVoiceAI
                     break;
             }
         }
+        static async Task SpeechToAudio()
+        {
+            var speechConfig = SpeechConfig.FromSubscription(AppConfiguration.speechKey, AppConfiguration.speechRegion);
+            speechConfig.SpeechRecognitionLanguage = "es-MX";
 
-    
+            using var audioConfig = AudioConfig.FromDefaultMicrophoneInput();
+            using var speechRecognizer = new SpeechRecognizer(speechConfig, audioConfig);
+
+            Console.WriteLine("Speak into your microphone.");
+            var speechRecognitionResult = await speechRecognizer.RecognizeOnceAsync();
+            OutputSpeechRecognitionResult(speechRecognitionResult);
+        }
+        static void OutputSpeechRecognitionResult(SpeechRecognitionResult speechRecognitionResult)
+        {
+            switch (speechRecognitionResult.Reason)
+            {
+                case ResultReason.RecognizedSpeech:
+                    Console.WriteLine($"RECOGNIZED: Text={speechRecognitionResult.Text}");
+                    break;
+                case ResultReason.NoMatch:
+                    Console.WriteLine($"NOMATCH: Speech could not be recognized.");
+                    break;
+                case ResultReason.Canceled:
+                    var cancellation = CancellationDetails.FromResult(speechRecognitionResult);
+                    Console.WriteLine($"CANCELED: Reason={cancellation.Reason}");
+
+                    if (cancellation.Reason == CancellationReason.Error)
+                    {
+                        Console.WriteLine($"CANCELED: ErrorCode={cancellation.ErrorCode}");
+                        Console.WriteLine($"CANCELED: ErrorDetails={cancellation.ErrorDetails}");
+                        Console.WriteLine($"CANCELED: Did you set the speech resource key and region values?");
+                    }
+                    break;
+            }
+        }
+
+
     }
     
 }
