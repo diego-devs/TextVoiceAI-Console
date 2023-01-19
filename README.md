@@ -11,7 +11,7 @@ setx SPEECH_KEY <key>
 setx SPEECH_REGION <region> 
 ```
 
-Verifica que la region sea la misma que esta configurada en el dashboard de Azure. En mi caso es: eastus.
+Verifica que la region sea la misma que esta configurada en el dashboard de Azure Cognitive Services. En mi caso es: eastus.
 
 Para ejecutar el programa usa: 
 
