@@ -1,8 +1,8 @@
-# TextVoiceAI
+# TextVoiceAI - Convertidor de Voz-Texto
 
 Este es un proyecto de consola escrito con .NET 7 y C# para probar el uso de Azure Cognitive Services y sus utilidades en sintetizador de texto a voz y reconocimiento de voz a texto.
 
-Para usar el servicio de Amazon Cognitive Services primero es necesario instalar el paquete de nuget Microsoft.CognitiveServices.Speech
+Para usar el servicio de **Azure Cognitive Services** primero es necesario instalar el paquete de nuget ```Microsoft.CognitiveServices.Speech```
 
 Tambien es necesario configurar dos variables de entorno usando el comando: 
 
